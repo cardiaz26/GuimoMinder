@@ -2,10 +2,14 @@ package com.example.cardiaz.notedispatcher.AddContact;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,16 +31,50 @@ import com.example.cardiaz.notedispatcher.AddContact.dummy.DummyContent;
  * Activities containing this fragment MUST implement the {@link OnFragmentInteractionListener}
  * interface.
  */
-public class SelectContactListFragment extends Fragment implements  AdapterView.OnItemClickListener {
+public class SelectContactListFragment extends Fragment implements  LoaderManager.LoaderCallbacks<Cursor>,
+        AdapterView.OnItemClickListener {
 
-    // TODO: Rename parameter arguments, choose names that match
+/*    // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
     // TODO: Rename and change types of parameters
     private String mParam1;
-    private String mParam2;
+    private String mParam2;*/
+
+    /*
+    * Defines an array that contains column names to move from
+    * the Cursor to the ListView.
+    */
+    @SuppressLint("InlinedApi")
+    private final static String[] FROM_COLUMNS = {
+            Build.VERSION.SDK_INT
+                    >= Build.VERSION_CODES.HONEYCOMB ?
+                    Contacts.DISPLAY_NAME_PRIMARY :
+                    Contacts.DISPLAY_NAME
+    };
+    /*
+         * Defines an array that contains resource ids for the layout views
+         * that get the Cursor column contents. The id is pre-defined in
+         * the Android framework, so it is prefaced with "android.R.id"
+         */
+    private final static int[] TO_IDS = {
+            android.R.id.text1
+    };
+
+    // Define global mutable variables
+    // Define a ListView object
+    ListView mContactsList;
+    // Define variables for the contact the user selects
+    // The contact's _ID value
+    long mContactId;
+    // The contact's LOOKUP_KEY
+    String mContactKey;
+    // A content URI for the selected contact
+    Uri mContactUri;
+    // An adapter that binds the result Cursor to the ListView
+    private SimpleCursorAdapter mCursorAdapter;
 
     private OnFragmentInteractionListener mListener;
 
@@ -52,14 +90,14 @@ public class SelectContactListFragment extends Fragment implements  AdapterView.
      * Views.
      */
     //private ListAdapter mAdapter;
-    private SimpleCursorAdapter mCursorAdapter;
+
 
     // TODO: Rename and change types of parameters
     public static SelectContactListFragment newInstance(String param1, String param2) {
         SelectContactListFragment fragment = new SelectContactListFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+/*        args.putString(ARG_PARAM1, param1);
+        args.putString(ARG_PARAM2, param2);*/
         fragment.setArguments(args);
         return fragment;
     }
@@ -75,10 +113,12 @@ public class SelectContactListFragment extends Fragment implements  AdapterView.
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+/*
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+*/
 
         /*// TODO: Change Adapter to display your content
         mAdapter = new ArrayAdapter<DummyContent.DummyItem>(getActivity(),
@@ -152,6 +192,20 @@ public class SelectContactListFragment extends Fragment implements  AdapterView.
         }
     }
 
+    @Override
+    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+        return null;
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
+
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> cursorLoader) {
+
+    }
 
 
     /**
