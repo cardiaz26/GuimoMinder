@@ -19,7 +19,7 @@ import com.example.cardiaz.notedispatcher.AddContact.SelectContact;
 
 public class MyActivity extends ActionBarActivity
     implements GetMessageFragment.OnFragmentInteractionListener, ContactListFragment.OnFragmentInteractionListener{
-
+    //Git-hub-test
     public final static String EXTRA_MESSAGE = "com.example.cardiaz.notedispatcher.MESSAGE";
 
     @Override
