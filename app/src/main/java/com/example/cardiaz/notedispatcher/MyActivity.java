@@ -7,6 +7,7 @@ import android.support.v7.app.ActionBar;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -25,6 +26,18 @@ public class MyActivity extends ActionBarActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            public void uncaughtException(Thread myThread, Throwable e) {
+                System.out.println(myThread.getName() + " throws exception: " + e);
+                e.printStackTrace();
+                return;
+            }
+        });
+
+
+
+
         setContentView(R.layout.activity_my);
         // Check that the activity is using the layout version with
         // the fragment_container FrameLayout
@@ -74,6 +87,7 @@ public class MyActivity extends ActionBarActivity
            /* // Add the fragment to the 'fragment_container' FrameLayout
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fragment_container, getMessageFragment).commit();*/
+
 
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
 
@@ -181,4 +195,7 @@ public class MyActivity extends ActionBarActivity
     public void onContactListSelectItemFragmentInteraction(String id) {
 
     }
+
+
+
 }

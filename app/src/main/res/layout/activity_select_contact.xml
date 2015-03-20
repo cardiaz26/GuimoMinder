@@ -9,4 +9,12 @@
     tools:context="com.example.cardiaz.notedispatcher.AddContact.SelectContact"
     android:id="@+id/select_contact_fragment_container">
 
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hi!!!!!!!"
+        android:paddingLeft="16dp"
+        android:paddingTop="300dp"
+        />
 </FrameLayout>

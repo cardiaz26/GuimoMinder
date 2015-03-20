@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.LayoutInflater;
@@ -18,7 +19,10 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.provider.ContactsContract.Contacts;
+
+import com.example.cardiaz.notedispatcher.ExceptionHandler;
 import com.example.cardiaz.notedispatcher.R;
+import android.support.v4.widget.CursorAdapter;
 
 import com.example.cardiaz.notedispatcher.AddContact.dummy.DummyContent;
 
@@ -32,7 +36,7 @@ import com.example.cardiaz.notedispatcher.AddContact.dummy.DummyContent;
  * interface.
  */
 public class SelectContactListFragment extends Fragment implements  LoaderManager.LoaderCallbacks<Cursor>,
-        AdapterView.OnItemClickListener {
+        AdapterView.OnItemClickListener  {
 
 /*    // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -110,8 +114,20 @@ public class SelectContactListFragment extends Fragment implements  LoaderManage
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        try {
+            myOnCreate();
+        } catch (Exception e) {
+            System.out.println("Error message:"+ e);
+            e.printStackTrace();
+        }
+
+    }
+
+    private void myOnCreate() throws Exception
+    {
+
 
 /*
         if (getArguments() != null) {
@@ -124,32 +140,133 @@ public class SelectContactListFragment extends Fragment implements  LoaderManage
         mAdapter = new ArrayAdapter<DummyContent.DummyItem>(getActivity(),
                 android.R.layout.simple_list_item_1, android.R.id.text1, DummyContent.ITEMS);
 */
+
+   /*         mListView = (AbsListView) view.findViewById(android.R.id.list);
+            ((AdapterView<ListAdapter>) mListView).setAdapter(mAdapter);*/
+        // Gets the ListView from the View list of the parent activity
+        mContactsList =
+                (ListView) getView().findViewById(R.id.select_contact_list_view);
         // Gets a CursorAdapter
         mCursorAdapter = new SimpleCursorAdapter(
                 getActivity(),
                 R.layout.fragment_selectcontactlist,
                 null,
-                null, null,
+                FROM_COLUMNS, TO_IDS,
                 0);
+        // Sets the adapter for the ListView
+        if (mContactsList != null) {
+            mContactsList.setAdapter(mCursorAdapter);
 
+            // Set the item click listener to be the current fragment.
+            mContactsList.setOnItemClickListener(this);
+        }
+        else
+        {
+            throw new Exception("Can't get ListView: mContactsList R.id.select_contact_list_view");
+        }
+        // Initializes the loader
+        getLoaderManager().initLoader(0, null, this);
     }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_selectcontactlist, container, false);
 
-        // Set the adapter
+        /*// Set the adapter
         // Gets the ListView from the View list of the parent activity
         mContactsAdapterView =
-                (ListView) getActivity().findViewById(R.id.select_contact_list_view);
+                (ListView) getActivity().findViewById(R.id.select_contact_list_view);*/
 
 
         // Set OnItemClickListener so we can be notified on item clicks
         //mListView.setOnItemClickListener(this);
-        mContactsAdapterView.setOnItemClickListener(this);
+        //mContactsAdapterView.setOnItemClickListener(this);
+
+
 
         return view;
+    }
+
+/*    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        // Gets the ListView from the View list of the parent activity
+        mContactsList =
+                (ListView) getActivity().findViewById(R.id.select_contact_list_view);
+        // Gets a CursorAdapter
+        mCursorAdapter = new SimpleCursorAdapter(
+                getActivity(),
+                R.layout.fragment_selectcontactlist,
+                null,
+                FROM_COLUMNS, TO_IDS,
+                0);
+        // Sets the adapter for the ListView
+        mContactsList.setAdapter(mCursorAdapter);
+
+        // Set the item click listener to be the current fragment.
+        mContactsList.setOnItemClickListener(this);
+
+        // Initializes the loader
+        getLoaderManager().initLoader(0, null, this);
+
+    }*/
+
+    @SuppressLint("InlinedApi")
+    private static final String[] PROJECTION =
+            {
+                    Contacts._ID,
+                    Contacts.LOOKUP_KEY,
+                    Build.VERSION.SDK_INT
+                            >= Build.VERSION_CODES.HONEYCOMB ?
+                            Contacts.DISPLAY_NAME_PRIMARY :
+                            Contacts.DISPLAY_NAME
+
+            };
+
+    // The column index for the _ID column
+    private static final int CONTACT_ID_INDEX = 0;
+    // The column index for the LOOKUP_KEY column
+    private static final int LOOKUP_KEY_INDEX = 1;
+
+    // Defines the text expression
+    @SuppressLint("InlinedApi")
+    private static final String SELECTION =
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB ?
+                    Contacts.DISPLAY_NAME_PRIMARY + " LIKE ?" :
+                    Contacts.DISPLAY_NAME + " LIKE ?";
+
+    // Defines a variable for the search string
+    private String mSearchString;
+    // Defines the array to hold values that replace the ?
+    private String[] mSelectionArgs = { mSearchString };
+
+    @Override
+    public void onItemClick(
+            AdapterView<?> parent, View item, int position, long rowID) {
+
+        Cursor cursor = null;
+        try {
+            // Get the Cursor
+            cursor = (Cursor) parent.getAdapter().getItem(position);
+        }
+        catch (Exception ex)
+        {
+            ExceptionHandler eh = new ExceptionHandler(ex,getActivity());
+        }
+
+        // Move to the selected contact
+        cursor.moveToPosition(position);
+        // Get the _ID value
+        mContactId = cursor.getLong(CONTACT_ID_INDEX);
+        // Get the selected LOOKUP KEY
+        mContactKey = cursor.getString(LOOKUP_KEY_INDEX);
+        // Create the contact's content Uri
+        mContactUri = Contacts.getLookupUri(mContactId, mContactKey);
+        /*
+         * You can use mContactUri as the content URI for retrieving
+         * the details for a contact.
+         */
     }
 
     @Override
@@ -170,14 +287,14 @@ public class SelectContactListFragment extends Fragment implements  LoaderManage
     }
 
 
-    @Override
+/*    @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         if (null != mListener) {
             // Notify the active callbacks interface (the activity, if the
             // fragment is attached to one) that an item has been selected.
             mListener.onSelectContactListFragmentInteraction(DummyContent.ITEMS.get(position).id);
         }
-    }
+    }*/
 
     /**
      * The default content for this Fragment has a TextView that is shown when
@@ -194,16 +311,33 @@ public class SelectContactListFragment extends Fragment implements  LoaderManage
 
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        return null;
+          /*
+         * Makes search string into pattern and
+         * stores it in the selection array
+         */
+        mSelectionArgs[0] = "%" + mSearchString + "%";
+        // Starts the query
+        return new CursorLoader(
+                getActivity(),
+                Contacts.CONTENT_URI,
+                PROJECTION,
+                SELECTION,
+                mSelectionArgs,
+                null
+        );
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-
+        // Put the result Cursor in the adapter for the ListView
+        mCursorAdapter.swapCursor(cursor);
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> cursorLoader) {
+        // Delete the reference to the existing Cursor
+        mCursorAdapter.swapCursor(null);
+
 
     }
 
@@ -223,17 +357,6 @@ public class SelectContactListFragment extends Fragment implements  LoaderManage
         public void onSelectContactListFragmentInteraction(String id);
     }
 
-    @SuppressLint("InlinedApi")
-    private static final String[] PROJECTION =
-            {
-                    Contacts._ID,
-                    Contacts.LOOKUP_KEY,
-                    Build.VERSION.SDK_INT
-                            >= Build.VERSION_CODES.HONEYCOMB ?
-                            Contacts.DISPLAY_NAME_PRIMARY :
-                            Contacts.DISPLAY_NAME
-
-            };
 
 
 }
