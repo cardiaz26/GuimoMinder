@@ -1,4 +1,4 @@
-package com.example.cardiaz.notedispatcher;
+package com.example.cardiaz.notedispatcher.AddContact;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -12,8 +12,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
+import com.example.cardiaz.notedispatcher.R;
 
-import com.example.cardiaz.notedispatcher.dummy.DummyContent;
+import com.example.cardiaz.notedispatcher.showAlertBox;
 
 /**
  * A fragment representing a list of Items.
@@ -24,19 +25,23 @@ import com.example.cardiaz.notedispatcher.dummy.DummyContent;
  * Activities containing this fragment MUST implement the {@link OnFragmentInteractionListener}
  * interface.
  */
-public class ContactListFragment extends Fragment implements AbsListView.OnItemClickListener {
+public class PhoneContactFragment extends Fragment implements AbsListView.OnItemClickListener {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
+    private static final String ARG_PARAM1 = "query";
     private static final String ARG_PARAM2 = "param2";
 
+
+
     // TODO: Rename and change types of parameters
-    private String mParam1;
+    private String query;
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
 
+    public final static String EXTRA_MESSAGE = "com.example.cardiaz.notedispatcher.MESSAGE";
+    public static ArrayAdapter<ContactablesLoaderCallbacks.ContactItem> mArrayAdapter = null;
     /**
      * The fragment's ListView/GridView.
      */
@@ -49,10 +54,10 @@ public class ContactListFragment extends Fragment implements AbsListView.OnItemC
     private ListAdapter mAdapter;
 
     // TODO: Rename and change types of parameters
-    public static ContactListFragment newInstance(String param1, String param2) {
-        ContactListFragment fragment = new ContactListFragment();
+    public static PhoneContactFragment newInstance(String query, String param2) {
+        PhoneContactFragment fragment = new PhoneContactFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
+        args.putString(ARG_PARAM1, query);
         args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
@@ -62,7 +67,7 @@ public class ContactListFragment extends Fragment implements AbsListView.OnItemC
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
      */
-    public ContactListFragment() {
+    public PhoneContactFragment() {
     }
 
     @Override
@@ -70,19 +75,25 @@ public class ContactListFragment extends Fragment implements AbsListView.OnItemC
         super.onCreate(savedInstanceState);
 
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
+            query = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
 
-        // TODO: Change Adapter to display your content
-        mAdapter = new ArrayAdapter<DummyContent.DummyItem>(getActivity(),
-                android.R.layout.simple_list_item_1, android.R.id.text1, DummyContent.ITEMS);
+
+
+        // DONE: Change Adapter to display your content
+
+        mArrayAdapter =new ArrayAdapter<ContactablesLoaderCallbacks.ContactItem>(getActivity(),
+                android.R.layout.simple_list_item_1, android.R.id.text1, ContactablesLoaderCallbacks.CONTACT_ITEMS);
+
+        mAdapter = mArrayAdapter;
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_contactlist, container, false);
+        View view = inflater.inflate(R.layout.fragment_phonecontact, container, false);
 
         // Set the adapter
         mListView = (AbsListView) view.findViewById(android.R.id.list);
@@ -114,10 +125,15 @@ public class ContactListFragment extends Fragment implements AbsListView.OnItemC
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        showAlertBox.Show("Clicked on item!",getActivity());
+
         if (null != mListener) {
             // Notify the active callbacks interface (the activity, if the
             // fragment is attached to one) that an item has been selected.
-            mListener.onContactListSelectItemFragmentInteraction(position);
+
+                mListener.onPhoneContactFragmentInteraction(position);
+
+
         }
     }
 
@@ -146,7 +162,8 @@ public class ContactListFragment extends Fragment implements AbsListView.OnItemC
      */
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        public void onContactListSelectItemFragmentInteraction(int position);
+        public void onPhoneContactFragmentInteraction(int position);
     }
+
 
 }

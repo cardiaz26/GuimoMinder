@@ -1,21 +1,15 @@
 package com.example.cardiaz.notedispatcher;
 
-import android.net.Uri;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.ActionBar;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
-import android.view.View;
-import android.widget.EditText;
 
 import com.example.cardiaz.notedispatcher.AddContact.SelectContact;
+import com.example.cardiaz.notedispatcher.dummy.DummyContent;
 
 
 public class MyActivity extends ActionBarActivity
@@ -58,8 +52,8 @@ public class MyActivity extends ActionBarActivity
             contactListFragment.setArguments(getIntent().getExtras());
 
             // Add the fragment to the 'fragment_container' FrameLayout
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.fragment_container, contactListFragment).commit();
+            getFragmentManager().beginTransaction()
+                    .replace(R.id.fragment_container, contactListFragment).addToBackStack(null).commit();
         }
 
     }
@@ -89,7 +83,7 @@ public class MyActivity extends ActionBarActivity
                     .replace(R.id.fragment_container, getMessageFragment).commit();*/
 
 
-            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            FragmentTransaction transaction = getFragmentManager().beginTransaction();
 
             // Replace whatever is in the fragment_container view with this fragment,
             // and add the transaction to the back stack so the user can navigate back
@@ -143,7 +137,7 @@ public class MyActivity extends ActionBarActivity
                 addContact();
                 return true;
             default:
-                return super.onOptionsItemSelected(item);
+                return true;
         }
     }
 
@@ -192,8 +186,8 @@ public class MyActivity extends ActionBarActivity
     }
 
     @Override
-    public void onContactListSelectItemFragmentInteraction(String id) {
-
+    public void onContactListSelectItemFragmentInteraction(int position) {
+        showAlertBox.Show(DummyContent.ITEMS.get(position).content,"Selected:",this);
     }
 
 
